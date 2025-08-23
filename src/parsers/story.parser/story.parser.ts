@@ -1,8 +1,9 @@
-import { Story } from '../../models/storymode.types.js';
-import { tokenize } from '../tokenizer.js';
+import { Story } from '../../models/storymode.types';
+import { tokenizeStory as tokenize } from '../../tokenizers/story.tokenizer/story.tokenizer';
 
 const META_RE = /^@([a-zA-Z_][a-zA-Z0-9_]*):\s*(.*)$/;
-const STORY_ID_RE = /^::story:\s*([a-zA-Z0-9_\-]+)/;
+// Capture full raw id (including potentially invalid chars) so schema can enforce pattern
+const STORY_ID_RE = /^::story:\s*(.+)$/;
 const END_ID_RE = /^::end:\s*\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/;
 const LIST_ITEM_RE = /^-\s+(.+)$/;
 
@@ -27,9 +28,9 @@ export function parseStoryFile(content: string, file = 'inline'): Story {
   for (const t of tokens) {
     switch (t.kind) {
       case 'StoryDirective': {
-        const m = t.text.match(STORY_ID_RE)!;
+  const m = t.text.match(STORY_ID_RE)!;
         if (id) diagnostics.push({ code: 'SM_DUP_STORY', message: 'Duplicate story directive', severity: 'error', file, line: t.line, column: t.column });
-        id = m[1];
+  id = m[1].trim();
         break;
       }
       case 'Metadata': {

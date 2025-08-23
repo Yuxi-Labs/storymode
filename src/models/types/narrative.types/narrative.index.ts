@@ -1,1 +1,1 @@
-export * from './narrative.types.js';
+export * from './narrative.types';

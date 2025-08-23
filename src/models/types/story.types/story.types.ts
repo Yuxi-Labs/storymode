@@ -1,4 +1,4 @@
-import type { Diagnostic } from '../common.types/common.types.js';
+import type { Diagnostic } from '../common.types/common.types';
 
 export interface Story {
   id: string;

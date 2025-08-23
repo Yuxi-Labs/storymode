@@ -1,4 +1,4 @@
-import type { Diagnostic, Cue } from '../common.types/common.types.js';
+import type { Diagnostic, Cue } from '../common.types/common.types';
 
 export interface Scene {
   id: string;

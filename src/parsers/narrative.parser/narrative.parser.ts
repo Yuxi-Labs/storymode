@@ -1,10 +1,11 @@
-import { Narrative, Scene, Cue } from '../../models/storymode.types.js';
-import { tokenize } from '../tokenizer.js';
+import { Narrative, Scene, Cue } from '../../models/storymode.types';
+import { tokenizeNarrative as tokenize } from '../../tokenizers/narrative.tokenizer/narrative.tokenizer';
 
 const META_RE = /^@([a-zA-Z_][a-zA-Z0-9_]*):\s*(.*)$/;
-const NARR_ID_RE = /^::narrative:\s*([a-zA-Z0-9_\-]+)/;
-const SCENE_ID_RE = /^::scene:\s*([a-zA-Z0-9_\-]+)/;
-const END_ID_RE = /^::end:\s*\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/;
+// Capture raw ids (schema will validate patterns)
+const NARR_ID_RE = /^::narrative:\s*(.+)$/;
+const SCENE_ID_RE = /^::scene:\s*(.+)$/;
+const END_ID_RE = /^::end:\s*\{\{\s*(.+?)\s*\}\}/;
 const CUE_RE = /^!(sfx|music|vfx):\s*(.*)$/;
 
 function normMetaKey(k: string) {
@@ -27,8 +28,8 @@ export function parseNarrativeFile(content: string, file = 'inline'): Narrative 
   for (const t of tokens) {
     switch (t.kind) {
       case 'NarrativeDirective': {
-        const m = t.text.match(NARR_ID_RE)!;
-        id = m[1];
+  const m = t.text.match(NARR_ID_RE)!;
+  id = m[1].trim();
         break;
       }
       case 'Metadata': {
@@ -46,9 +47,9 @@ export function parseNarrativeFile(content: string, file = 'inline'): Narrative 
         break;
       }
       case 'SceneDirective': {
-        const m = t.text.match(SCENE_ID_RE)!;
-        if (current) scenes.push(current);
-        current = { id: m[1], metadata: {}, cues: [], line: t.line };
+  const m = t.text.match(SCENE_ID_RE)!;
+  if (current) scenes.push(current);
+  current = { id: m[1].trim(), metadata: {}, cues: [], line: t.line };
         break;
       }
       case 'Cue': {
@@ -64,7 +65,7 @@ export function parseNarrativeFile(content: string, file = 'inline'): Narrative 
       case 'EndDirective': {
         if (current) {
           const m = t.text.match(END_ID_RE)!;
-          if (m[1] !== current.id) {
+          if (m[1].trim() !== current.id) {
             diagnostics.push({ code: 'SM_SCENE_END_MISMATCH', message: `Scene end id mismatch (expected ${current.id})`, severity: 'error', file, line: t.line, column: t.column });
           }
           current.endLine = t.line;
@@ -72,7 +73,7 @@ export function parseNarrativeFile(content: string, file = 'inline'): Narrative 
           current = null;
         } else {
           const m = t.text.match(END_ID_RE)!;
-          if (m[1] !== id) {
+          if (m[1].trim() !== id) {
             diagnostics.push({ code: 'SM_END_UNUSED', message: 'Unmatched ::end directive', severity: 'warning', file, line: t.line, column: t.column });
           }
         }
