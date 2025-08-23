@@ -1,0 +1,33 @@
+{
+  "name": "storymode",
+  "version": "1.0.0",
+  "description": "This is the StoryMode SDK.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "vitest run",
+    "dev": "turbo dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yuxi-Labs/storymode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Yuxi-Labs/storymode/issues"
+  },
+  "homepage": "https://github.com/Yuxi-Labs/storymode#readme",
+  "license": "ISC",
+  "devDependencies": {
+    "turbo": "^2.5.6",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0",
+    "@types/node": "^20.11.0"
+  }
+}
