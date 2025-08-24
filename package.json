@@ -13,14 +13,12 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "test": "vitest run",
-    "dev": "turbo dev",
-  "desktop:renderer": "vite --config src/apps/desktop-editor/vite.config.ts",
-  "desktop:main:watch": "vite build --watch --config src/apps/desktop-editor/vite.main.config.ts",
-  "desktop:electron": "wait-on dist/apps/desktop-editor/main/electron-main.js http://localhost:5173 && cross-env STORYMODE_DEV=1 electron dist/apps/desktop-editor/main/electron-main.js",
-  "desktop:dev": "concurrently -k -n RENDERER,MAIN,ELECTRON \"npm:desktop:renderer\" \"npm:desktop:main:watch\" \"npm:desktop:electron\""
-  ,"desktop:build:renderer": "vite build --config src/apps/desktop-editor/vite.config.ts",
-  "desktop:build:main": "vite build --config src/apps/desktop-editor/vite.main.config.ts",
-  "desktop:build": "npm run desktop:build:renderer && npm run desktop:build:main"
+    "dev:web": "vite --config src/apps/desktop-editor/vite.config.ts",
+  "dev:desktop": "concurrently -k -n RENDERER,MAIN,ELECTRON \"vite --config src/apps/desktop-editor/vite.config.ts\" \"vite build --watch --config src/apps/desktop-editor/vite.main.config.ts\" \"wait-on dist/apps/desktop-editor/main/electron-main.js http://localhost:5173 && cross-env STORYMODE_DEV=1 electron dist/apps/desktop-editor/main/electron-main.js --dev\"",
+    "dev": "npm run dev:desktop",
+    "desktop:build:renderer": "vite build --config src/apps/desktop-editor/vite.config.ts",
+    "desktop:build:main": "vite build --config src/apps/desktop-editor/vite.main.config.ts",
+    "desktop:build": "npm run desktop:build:renderer && npm run desktop:build:main"
   },
   "repository": {
     "type": "git",
@@ -39,18 +37,18 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "electron": "^30.0.0",
-  "cross-env": "^7.0.3",
-  "react": "^18.2.0",
-  "react-dom": "^18.2.0",
-  "@types/react": "^18.2.0",
-  "@types/react-dom": "^18.2.0",
-  "vite": "^5.3.0",
-  "@vitejs/plugin-react": "^4.0.0",
-  "tailwindcss": "^3.4.7",
-  "postcss": "^8.4.41",
-  "autoprefixer": "^10.4.19",
-  "concurrently": "^8.2.2",
-  "wait-on": "^7.2.0",
-  "monaco-editor": "^0.49.0"
+    "cross-env": "^7.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "vite": "^5.3.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "tailwindcss": "^3.4.7",
+    "postcss": "^8.4.41",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0",
+    "monaco-editor": "^0.49.0"
   }
 }

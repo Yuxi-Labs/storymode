@@ -1,7 +1,7 @@
-# StoryMode DSL (Initial Minimal Spec)
+# StoryMode DSL Specification (Implemented Feature Set – v0.0.1)
 
-This document captures the currently accepted minimal syntax decisions.
-Further proposals are discarded until explicitly revived.
+This document reflects the **currently implemented** syntax and behavior in the codebase (desktop editor + core parsers) as of release `v0.0.1`.
+Sections once marked *deferred* have been reconciled; anything still deferred is explicitly listed at the end.
 
 ## Directives
 - `::story: <id>` begins a story file. Ends with `::end: {{ <id> }}`.
@@ -80,11 +80,99 @@ No other directive forms are currently accepted. Extra colons (`:::`) are invali
 - `{{ id }}` used in end directives (scene, narrative, story).
 - Spaces inside braces normalized.
 
-## Character & Dialogue (Deferred)
-- Character marker syntax and dialogue rules are deferred; anything starting with `[[` currently unsupported (diagnostic) until finalized.
+## Character & Dialogue (Implemented)
+Character dialogue blocks and dialogue lines are supported.
 
-## Cues / Actions (Deferred)
-- Lines starting with `!`, `^^`, or other prospective cue markers are unsupported (diagnostic) until cue system finalized.
+### Syntax
+Character header line:
+```
+[[ CHARACTER NAME ]]
+```
+- Double brackets, inner content up to 60 chars, trimmed; any trailing/leading spaces inside brackets removed.
+- Name kept as authored (case preserved) but tooling may display uppercase.
+
+Dialogue lines:
+```
+"This is a line of dialogue." 
+"Another line continuing the speech."
+```
+Each dialogue line must immediately follow its character header or a previous dialogue line for the same character. A blank line, cue, metadata line, new character, or directive terminates the current character dialogue block.
+
+### Data Model Additions
+Scene gains:
+```
+dialogue: Array<{
+  character: string;
+  line: number; // starting line of character block
+  lines: { text: string; line: number; column: number }[];
+}>
+```
+
+### Validation
+- Dialogue line without an active character block → warning `SM_DIALOGUE_NO_CHARACTER`.
+- Empty character block (no dialogue lines) is silently ignored (not emitted) (future: warning).
+
+### Printing / Preview Rules
+1. Character name rendered (currently bold + indented in preview). Uppercasing may be applied visually.
+2. Dialogue lines appear further indented below the character name (preview uses separate style classes rather than literal spaces in source lines).
+3. Multiple dialogue blocks for the same character are allowed; they remain separate.
+4. Any cue, action line, blank line, new character, or directive terminates the active block.
+
+### Future (Deferred Advanced Dialogue)
+- Parentheticals (e.g., `(whispering)`)
+- Multi-paragraph dialogue wrapping rules
+- Dual dialogue columns
+- Character aliases / normalization
+- Automatic character list extraction for credits.
+
+## Action Lines (Implemented)
+Single-line action / description lines use the syntax:
+```
+!action: Description of environment or stage direction.
+```
+They are stored as:
+```ts
+interface ActionLine { text: string; line: number; column: number; }
+scene.actions: ActionLine[]
+```
+Rules:
+1. Must start with `!action:` (case-sensitive) followed by text (trimmed once; internal spacing preserved).
+2. Appears intermixed with cues and dialogue.
+3. Printed in preview as italic (current styling).
+4. Empty body after `!action:` → warning (future: implement diagnostic code `SM_ACTION_EMPTY`).
+
+## Cue Lines (Implemented)
+Cue lines are part of the minimal spec inside scene bodies.
+
+Syntax (one per line):
+```
+!sfx: boom             # one or more short SFX identifiers
+!music: deep_underscore
+!vfx: sparks, smoke    # comma or bracket list allowed (parser normalizes)
+```
+
+Current parser implementation (v0.0.1):
+```
+!sfx: item1, item2, item3
+!music: track_id
+!vfx: effect_a, effect_b
+```
+Accepted list forms: comma‑separated tokens; brackets are tolerated if already authored but output stored as items array.
+
+Data model:
+```ts
+interface Cue { type: 'sfx' | 'music' | 'vfx'; items: string[]; line: number; column: number; }
+scene.cues: Cue[] // order preserved
+```
+
+Validation (implemented / partial):
+- Unknown cue type → warning (`SM450` planned; may currently appear as generic unknown line if unrecognized).
+- Empty item list → warning (planned).
+- Duplicate items inside one cue line → warning (planned).
+
+Preview Printing:
+- Shown with uppercase label (SFX/MUSIC/VFX) followed by colon and comma-separated list.
+- Coloring/styling applied (indigo tone for cues).
 
 ## Comments & Notes (Deferred)
 - Lines beginning with `#`, `//`, `###`, or similar are treated as unknown and produce diagnostics.
@@ -104,80 +192,35 @@ No other directive forms are currently accepted. Extra colons (`:::`) are invali
 - Remove trailing whitespace.
 - Ensure final newline.
 
-## Out of Scope (Explicitly Deferred)
-- Dialogue blocks `[[ Name ]]`.
-- Speech lines `"..."`.
-- Action/cue prefixes (^^, !action:, etc.).
-- Multi-line notes or comments.
-- Jump/alternate target lists after scene end lines (future feature; not specified yet).
-- Plugin / extension directives.
+## Variant Scene Lists on End Directives (Implemented)
+Base scene end directive may enumerate variant scenes:
+Inline form:
+```
+::end: {{ corridor_glitch }} -> [ {{ corridor_glitch_alt_a }}, {{ corridor_glitch_alt_b }} ]
+```
+Multiline form:
+```
+::end: {{ corridor_glitch }} -> [
+  {{ corridor_glitch_alt_a }}
+  {{ corridor_glitch_alt_b }}
+]
+```
+Parser collects variant ids into `scene.variants`. Unknown variant ids (no matching subsequent variant scene) may generate future warnings (pending rule).
+
+## Deferred (Not Yet Implemented)
+- Parentheticals in dialogue `(whispering)`.
+- Dual / simultaneous dialogue columns.
+- Character alias normalization / canonicalization list.
+- Automatic extraction of character list for credits page.
+- Advanced cue validation diagnostics (duplicate item, empty list).
+- Notes / comment syntax (`#`, `//`) with structured suppression (currently emit generic unknown warnings).
+- Jump/alternate branching directives post-scene.
+- Plugin / extension directive namespace.
 
 ## Rationale
 Keep the DSL minimal until core parsing, validation, and formatting for stories, narratives, scenes, and variants are stable. Additional constructs will be layered gradually.
 
 ---
-End of minimal spec.
-
-## Cue Lines (Introduced)
-Cue lines are now part of the minimal spec inside scene bodies (after a scene directive and before `::end:`). They are optional and may appear in any order before dialogue features (still deferred) or other future constructs.
-
-Syntax (single line each, 2-space indentation relative to scene body level):
-- `!sfx: <id_or_list>` one or more short, discrete sound effect identifiers.
-- `!music: <track_id>` a background music track (one per line; multiple lines can indicate sequential changes).
-- `!vfx: <id_or_list>` one or more visual effect identifiers.
-
-Values:
-- Single token or bracketed list: `[id1, id2, id3]` (commas optional after last; internal spaces trimmed).
-- Comma-separated form without brackets MAY be accepted in future; canonical output uses bracketed form when >1 item.
-- Identifier charset: `[a-zA-Z0-9_\-]` (no spaces). Unknown characters → warning.
-
-Semantics:
-- `!sfx` items are momentary triggers (printed inline under scene with label `SFX:`).
-- `!music` sets or changes the currently active music layer (printed as `MUSIC:`). Replacing earlier music does not require an explicit stop token.
-- `!vfx` items denote simultaneous visual effect cues (printed as `VFX:`).
-- Multiple cues of different types MAY be adjacent; ordering preserved.
-
-Printing Rules:
-1. Each cue line prints on its own output line in the final script, prefixed by its uppercase label (SFX / MUSIC / VFX) followed by a colon and a space-separated canonical list of items.
-2. Single-item lists print without brackets; multi-item lists print with brackets in-angle or bracket style? Canonical: retain brackets `[a, b]` for >1 items.
-3. Consecutive cues of the same type are NOT merged automatically (author’s order retained).
-
-Data Model (proposed):
-```ts
-interface CueBase { type: 'sfx' | 'music' | 'vfx'; line: number; column: number; raw: string; }
-interface MultiItemCue extends CueBase { items: string[]; }
-// music is effectively a single-item cue but modelled uniformly
-export type Cue = MultiItemCue;
-```
-Scenes acquire:
-```ts
-interface Scene {
-  id: string;
-  variantOf?: string; // from @variant_of
-  cues: Cue[]; // in encountered order
-  // ... existing / future fields
-}
-```
-
-Validation:
-- Duplicate item inside one cue list → warning (DuplicateCueItem).
-- Empty bracket list `[]` → warning (EmptyCueList).
-- Unknown cue type (any `!<key>:` not sfx|music|vfx) → warning (UnknownCueType) (reserved for plugins later).
-- Ill-formed list (missing closing bracket) → error (MalformedCueList).
-
-Diagnostics Codes (added):
-- SM450 UnknownCueType
-- SM451 MalformedCueList
-- SM452 EmptyCueList
-- SM453 DuplicateCueItem
-- SM454 InvalidCueIdentifier
-
-Formatter:
-- Normalize indentation to 2 spaces beyond scene directive indentation.
-- Sort items inside a list? NO — preserve author order.
-- Remove duplicate trailing commas inside lists.
-- Insert a space after commas.
-
-Deferred Still:
+<!-- Previous exploratory cue proposal section removed; consolidated into implemented Cue Lines section above. -->
 - Character / dialogue blocks `[[ Name ]]`.
 - Action lines (e.g., `!action:`) — may be added similarly later.

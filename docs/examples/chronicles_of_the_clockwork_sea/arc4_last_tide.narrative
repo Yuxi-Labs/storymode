@@ -1,0 +1,30 @@
+::narrative: arc4_last_tide
+@title: Arc 4 - The Last Tide
+::scene: convergence
+@title: Convergence Of Currents
+!sfx: conch_call, rotor_sync
+!music: rising_finale
+ !action: Oceanic vortices knit a luminous lattice below.
+ [[ CAPTAIN ORLA ]]
+ "Every current we bent now returns to judge the sum."
+::end: {{ convergence }}
+::scene: ascension
+@title: Ascension Of The Archipelago
+!sfx: stone_shift, steam_exhale
+!music: triumphant_coda
+!vfx: sunrise_bloom
+ !action: Islands heave upward shedding waterfalls of light.
+ [[ CAPTAIN ORLA ]]
+ "Mark the chronometers—history is re-forging itself." 
+ [[ ENGINEER LYRA ]]
+ "Stability arcs holding— ascension nominal!"
+::end: {{ ascension }}
+::scene: epilogue
+@title: Epilogue
+!sfx: gentle_wave
+!music: soft_after
+ !action: Quiet gears spin down into an emerald hush.
+ [[ CAPTAIN ORLA ]]
+ "Chart appended. Let the sea dream in brass again."
+::end: {{ epilogue }}
+::end: {{ arc4_last_tide }}

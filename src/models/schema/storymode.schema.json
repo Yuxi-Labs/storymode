@@ -29,11 +29,44 @@
         "variantOf": { "type": "string" },
         "metadata": { "type": "object", "additionalProperties": true },
         "cues": { "type": "array", "items": { "$ref": "#/$defs/cue" }, "minItems": 0 },
+        "dialogue": { "type": "array", "items": { "$ref": "#/$defs/dialogueBlock" }, "minItems": 0 },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/actionLine" }, "minItems": 0 },
+        "variants": { "type": "array", "items": { "$ref": "#/$defs/id" }, "minItems": 0, "uniqueItems": true },
         "line": { "type": "number" },
         "endLine": { "type": ["number","null"] }
       },
-      "required": ["id","metadata","cues","line"],
+      "required": ["id","metadata","cues","dialogue","actions","line"],
       "additionalProperties": true
+    },
+    "dialogueLine": {
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "line": { "type": "number" },
+        "column": { "type": "number" }
+      },
+      "required": ["text","line","column"],
+      "additionalProperties": false
+    },
+    "dialogueBlock": {
+      "type": "object",
+      "properties": {
+        "character": { "type": "string" },
+        "lines": { "type": "array", "items": { "$ref": "#/$defs/dialogueLine" }, "minItems": 1 },
+        "line": { "type": "number" }
+      },
+      "required": ["character","lines","line"],
+      "additionalProperties": false
+    },
+    "actionLine": {
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "line": { "type": "number" },
+        "column": { "type": "number" }
+      },
+      "required": ["text","line","column"],
+      "additionalProperties": false
     },
     "diagnostic": {
       "type": "object",

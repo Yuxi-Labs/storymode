@@ -1,0 +1,24 @@
+::narrative: arc1_awakening_atoll
+@title: Arc 1 - Awakening Atoll
+::scene: arrival
+@title: Arrival At Rust Reef
+!sfx: anchor_drop, steam_release
+!music: motif_arrival
+ !action: The submersible surfaces amid clattering reef machinery.
+ [[ CAPTAIN ORLA ]]
+ "Hold trim at ten degrees. Let the reef breathe around us."
+ "No sudden thrust—these relic gears are older than nations."
+ !action: A spray of rusted brine mists the deck.
+::end: {{ arrival }}
+::scene: workshop
+@title: The Tinker's Workshop
+!sfx: gear_clicks, tiny_hammer
+!music: ticking_lullaby
+!vfx: ember_sparks
+ !action: Lantern light dances across brass limb prototypes.
+ [[ TINKER JAS ]] 
+ "Three more rotations and the regulator aligns."
+ [[ CAPTAIN ORLA ]]
+ "Make it two. Storm windows are narrowing."
+::end: {{ workshop }}
+::end: {{ arc1_awakening_atoll }}
