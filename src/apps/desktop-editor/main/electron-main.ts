@@ -6,6 +6,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Track colour mode (auto/dark/light) independent from custom theme choice
+let colorModePreference: 'auto' | 'dark' | 'light' = 'auto';
+let themeChoice: 'none' | 'narnia' | 'oldenglish' | 'bleu' = 'none';
+
 function buildMenu(win: BrowserWindow) {
   const template: (Electron.MenuItemConstructorOptions)[] = [
     {
@@ -17,6 +21,10 @@ function buildMenu(win: BrowserWindow) {
         { label: 'Open...', accelerator: 'Ctrl+O', click: () => win.webContents.send('storymode:menu', { command: 'open' }) },
         { label: 'Save', accelerator: 'Ctrl+S', click: () => win.webContents.send('storymode:menu', { command: 'save' }) },
         { label: 'Save As...', accelerator: 'Ctrl+Shift+S', click: () => win.webContents.send('storymode:menu', { command: 'save-as' }) },
+  { type: 'separator' },
+  { label: 'Preview Story', accelerator: 'Ctrl+P', click: () => win.webContents.send('storymode:menu', { command: 'preview-story' }) },
+  { label: 'Validate Story', click: () => win.webContents.send('storymode:menu', { command: 'validate-story' }) },
+  { label: 'Print Story', click: () => win.webContents.send('storymode:menu', { command: 'print-story' }) },
         { type: 'separator' },
         { role: 'quit' }
       ]
@@ -38,15 +46,48 @@ function buildMenu(win: BrowserWindow) {
     {
       label: 'View',
       submenu: [
+        {
+          label: 'Appearance',
+          submenu: [
+            {
+              label: 'Colour Mode',
+              submenu: [
+                { label: 'Auto', type: 'radio', checked: colorModePreference === 'auto', click: () => { colorModePreference = 'auto'; buildMenu(win); win.webContents.send('storymode:menu', { command: 'theme-auto' }); } },
+                { label: 'Dark', type: 'radio', checked: colorModePreference === 'dark', click: () => { colorModePreference = 'dark'; buildMenu(win); win.webContents.send('storymode:menu', { command: 'theme-dark' }); } },
+                { label: 'Light', type: 'radio', checked: colorModePreference === 'light', click: () => { colorModePreference = 'light'; buildMenu(win); win.webContents.send('storymode:menu', { command: 'theme-light' }); } }
+              ]
+            },
+            {
+              label: 'Themes',
+              submenu: [
+                { label: 'None', type: 'radio', checked: themeChoice === 'none', click: () => { themeChoice = 'none'; buildMenu(win); win.webContents.send('storymode:menu', { command: 'theme-clear' }); } },
+                { label: 'Narnia', type: 'radio', checked: themeChoice === 'narnia', click: () => { themeChoice = 'narnia'; buildMenu(win); win.webContents.send('storymode:menu', { command: 'theme-narnia' }); } },
+                { label: 'Old English', type: 'radio', checked: themeChoice === 'oldenglish', click: () => { themeChoice = 'oldenglish'; buildMenu(win); win.webContents.send('storymode:menu', { command: 'theme-oldenglish' }); } },
+                { label: 'Bleu', type: 'radio', checked: themeChoice === 'bleu', click: () => { themeChoice = 'bleu'; buildMenu(win); win.webContents.send('storymode:menu', { command: 'theme-bleu' }); } }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    { role: 'window', submenu: [
+      { role: 'minimize' },
+      { label: 'Maximize', click: () => { const w = BrowserWindow.getFocusedWindow(); if (w) { if (w.isMaximized()) w.unmaximize(); else w.maximize(); } } },
+      { role: 'close' }
+    ] },
+    {
+      label: 'Tools',
+      submenu: [
         { role: 'reload' }, { role: 'forceReload' }, { type: 'separator' },
         { role: 'toggleDevTools' }, { type: 'separator' }, { role: 'togglefullscreen' }
       ]
     },
-    { role: 'window', submenu: [{ role: 'minimize' }, { role: 'close' }] },
     {
       role: 'help',
       submenu: [
-        { label: 'Learn More', click: () => win.webContents.send('storymode:menu', { command: 'help-learn-more' }) }
+  { label: 'About StoryMode', click: () => openAboutWindow(win) },
+  { type: 'separator' },
+  { label: 'Learn More', click: () => win.webContents.send('storymode:menu', { command: 'help-learn-more' }) }
       ]
     }
   ];
@@ -111,12 +152,23 @@ ipcMain.handle('storymode:save-file-as', async (_e, { name, content }) => {
   return { saved: true, path: saveRes.filePath };
 });
 
+// Theme preference update from renderer
+ipcMain.on('storymode:set-theme-pref', (_e, pref: any) => {
+  if (['auto','dark','light'].includes(pref)) {
+    colorModePreference = pref;
+  } else if (['narnia','oldenglish','bleu','none'].includes(pref)) {
+    themeChoice = pref === 'none' ? 'none' : pref;
+  }
+  const win = BrowserWindow.getFocusedWindow() || mainWindow;
+  if (win) buildMenu(win);
+});
+
 function ensureGeneratedPreload(): string {
   const genDir = path.join(app.getPath('userData'), 'generated');
   if (!fs.existsSync(genDir)) fs.mkdirSync(genDir, { recursive: true });
   const preloadPath = path.join(genDir, 'preload.cjs');
   if (!fs.existsSync(preloadPath)) {
-    fs.writeFileSync(preloadPath, `const { contextBridge, ipcRenderer } = require('electron');\nconsole.log('[storymode][preload] generated preload loaded');\ncontextBridge.exposeInMainWorld('storymodeAPI',{onMenu:(h)=>{ipcRenderer.removeAllListeners('storymode:menu');ipcRenderer.on('storymode:menu',(_,d)=>h(d));},openFilesDialog:()=>ipcRenderer.invoke('storymode:open-files'),saveFile:(n,c,p)=>ipcRenderer.invoke('storymode:save-file',{name:n,content:c,suggestedPath:p}),saveFileAs:(n,c)=>ipcRenderer.invoke('storymode:save-file-as',{name:n,content:c})});`,'utf8');
+  fs.writeFileSync(preloadPath, `const { contextBridge, ipcRenderer } = require('electron');\nconsole.log('[storymode][preload] generated preload loaded');\ncontextBridge.exposeInMainWorld('storymodeAPI',{onMenu:(h)=>{ipcRenderer.removeAllListeners('storymode:menu');ipcRenderer.on('storymode:menu',(_,d)=>h(d));},openFilesDialog:()=>ipcRenderer.invoke('storymode:open-files'),saveFile:(n,c,p)=>ipcRenderer.invoke('storymode:save-file',{name:n,content:c,suggestedPath:p}),saveFileAs:(n,c)=>ipcRenderer.invoke('storymode:save-file-as',{name:n,content:c}),setThemePreference:(pref)=>ipcRenderer.send('storymode:set-theme-pref',pref)});`,'utf8');
   }
   return preloadPath;
 }
@@ -233,3 +285,82 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason) => {
   console.error('[storymode] unhandled rejection', reason);
 });
+
+// ABOUT WINDOW
+let aboutWindow: BrowserWindow | null = null;
+function openAboutWindow(parent: BrowserWindow) {
+  if (aboutWindow && !aboutWindow.isDestroyed()) {
+    aboutWindow.focus();
+    return;
+  }
+  const logoCandidates = [
+    path.join(process.cwd(), 'assets', 'images', 'logos', 'storymode-logo.png'),
+    path.join(process.cwd(), 'assets', 'images', 'logos', 'storymode-logo-char.png')
+  ];
+  let logoPath = logoCandidates.find(p => fs.existsSync(p));
+  let logoDataUri = '';
+  try {
+    if (logoPath) {
+      const buf = fs.readFileSync(logoPath);
+      logoDataUri = `data:image/png;base64,${buf.toString('base64')}`;
+    }
+  } catch (err) {
+    console.warn('[storymode][about] unable to read logo', err);
+  }
+  const sys = {
+    appVersion: app.getVersion(),
+    electron: process.versions.electron,
+    chrome: process.versions.chrome,
+    node: process.versions.node,
+    v8: process.versions.v8,
+    platform: process.platform,
+    arch: process.arch
+  };
+  const sysRows = Object.entries(sys).map(([k,v]) => `<tr><td style="padding:4px 8px;text-align:right;font-weight:400;color:#aaa;font-size:11px;">${k}</td><td style="padding:4px 8px;color:#ccc;font-size:11px;">${v}</td></tr>`).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset='utf-8'/><title>About StoryMode</title>
+  <style>
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif; background:#1e1e1e; color:#ddd; }
+  .wrapper { padding:24px 28px 32px; max-width:760px; position:relative; }
+  h2 { margin:16px 0 6px; font-size:13px; font-weight:400; letter-spacing:.2px; color:#bbb; }
+  table { border-collapse:collapse; width:100%; background:#252526; border:1px solid #333; border-radius:6px; overflow:hidden; font-size:12px; }
+  tr:nth-child(even){ background:#2a2a2a; }
+  footer { margin-top:18px; font-size:12px; color:#888; line-height:1.5; }
+  .logo { width:100%; height:auto; display:block; image-rendering:-webkit-optimize-contrast; margin:0 0 14px; }
+    a { color:#4fa3ff; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    button.copy { background:#333; border:1px solid #444; color:#ddd; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
+    button.copy:hover { background:#3a3a3a; }
+    pre { user-select:all; font-size:11px; line-height:1.3; background:#111; padding:8px 10px; border:1px solid #333; border-radius:4px; overflow:auto; }
+  </style></head><body>
+  <div class='wrapper'>
+  ${logoDataUri ? `<img class='logo' src='${logoDataUri}' alt='StoryMode Logo'/>` : ''}
+  <div style='margin:0 0 12px; font-size:14px; color:#aaa;'>An environment for writing stories for video games</div>
+  <div style='font-size:12px; color:#888; margin:0 0 16px;'>© 2025 William Sawyerr. All rights reserved.</div>
+    <h2>System Information</h2>
+    <table>${sysRows}</table>
+  <footer>This application uses Electron, Chromium, and Node.js.</footer>
+  </div>
+  <script>
+  // (Copy button removed intentionally)
+  </script>
+  </body></html>`;
+  aboutWindow = new BrowserWindow({
+    width: 700,
+    height: 520,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    title: 'About StoryMode',
+    backgroundColor: '#1e1e1e',
+    parent,
+    modal: true,
+    show: false,
+    webPreferences: { devTools: false }
+  });
+  aboutWindow.removeMenu();
+  aboutWindow.on('closed', () => { aboutWindow = null; });
+  const dataUrl = 'data:text/html;base64,' + Buffer.from(html,'utf8').toString('base64');
+  aboutWindow.loadURL(dataUrl).finally(()=>{
+    if (aboutWindow) aboutWindow.show();
+  });
+}

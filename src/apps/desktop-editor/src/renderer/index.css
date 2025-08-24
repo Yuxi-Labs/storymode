@@ -1,5 +1,133 @@
+/* Tailwind directives (processed at build time) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* If a plain CSS linter flags the @tailwind rules, it's safe to ignore; build pipeline expands them. */
 
-html, body { @apply h-full w-full overflow-hidden; }
+html, body { height:100%; width:100%; overflow:hidden; }
+
+/* Theme variables */
+:root {
+	--sm-bg: #0e0f11;
+	--sm-panel: #1c1f23;
+	--sm-panel-alt: #23272c;
+	--sm-border: #2a2f35;
+	--sm-text: #e2e8f0;
+	--sm-text-dim: #94a3b8;
+	--sm-accent: #6366f1;
+	--sm-accent-hover: #818cf8;
+	--sm-sidebar-active-bg: #2d3239;
+	--sm-sidebar-hover-bg: #24292f;
+	--sm-status-bg: var(--sm-panel);
+	--sm-status-fg: var(--sm-text-dim);
+	--sm-status-fg-strong: var(--sm-text);
+	--sm-scrollbar: #3a424b;
+}
+
+/* Light theme overrides */
+:root[data-theme='light'] {
+	--sm-bg: #f5f7fa;
+	--sm-panel: #ffffff;
+	--sm-panel-alt: #f1f5f9;
+	--sm-border: #d9e0e7;
+	--sm-text: #1e293b;
+	--sm-text-dim: #64748b;
+	--sm-accent: #4f46e5;
+	--sm-accent-hover: #6366f1;
+	--sm-sidebar-active-bg: #e2e8f0;
+	--sm-sidebar-hover-bg: #eef2f6;
+	--sm-status-bg: #ffffff;
+	--sm-status-fg: #64748b;
+	--sm-status-fg-strong: #1e293b;
+	--sm-scrollbar: #c6ced6;
+}
+
+/* Custom Theme: Narnia (golden & warm parchment) */
+:root[data-theme='narnia'] {
+	--sm-bg: #1d1a13;
+	--sm-panel: #262117;
+	--sm-panel-alt: #2e281d;
+	--sm-border: #3a301f;
+	--sm-text: #f5e9c9;
+	--sm-text-dim: #c7b897;
+	--sm-accent: #ffca28;
+	--sm-accent-hover: #ffd95e;
+	--sm-sidebar-active-bg: #3a301f;
+	--sm-sidebar-hover-bg: #302718;
+	--sm-status-bg: #262117;
+	--sm-status-fg: #c7b897;
+	--sm-status-fg-strong: #ffe9b0;
+	--sm-scrollbar: #4b3d28;
+}
+
+/* Custom Theme: Old English (heritage parchment + deep reds) */
+:root[data-theme='oldenglish'] {
+	--sm-bg: #f4f2ec;
+	--sm-panel: #efece4;
+	--sm-panel-alt: #e6e0d4;
+	--sm-border: #d6c8b8;
+	--sm-text: #2f2a24;
+	--sm-text-dim: #6a5c4c;
+	--sm-accent: #8b0000;
+	--sm-accent-hover: #a30000;
+	--sm-sidebar-active-bg: #e0d6c9;
+	--sm-sidebar-hover-bg: #e9dfd2;
+	--sm-status-bg: #e6e0d4;
+	--sm-status-fg: #6a5c4c;
+	--sm-status-fg-strong: #2f2a24;
+	--sm-scrollbar: #c3b4a3;
+}
+
+/* Custom Theme: Bleu (navy / steel blues) */
+:root[data-theme='bleu'] {
+	--sm-bg: #0f1419;
+	--sm-panel: #141b22;
+	--sm-panel-alt: #1c252e;
+	--sm-border: #27323d;
+	--sm-text: #d2e4ef;
+	--sm-text-dim: #8fa5b4;
+	--sm-accent: #4fc3f7;
+	--sm-accent-hover: #81d4fa;
+	--sm-sidebar-active-bg: #1c252e;
+	--sm-sidebar-hover-bg: #192129;
+	--sm-status-bg: #141b22;
+	--sm-status-fg: #89a0af;
+	--sm-status-fg-strong: #d2e4ef;
+	--sm-scrollbar: #2f3d48;
+}
+
+/* Auto: follow prefers-color-scheme if no explicit data-theme set */
+@media (prefers-color-scheme: light) {
+	:root:not([data-theme='dark']):not([data-theme='light']) {
+		--sm-bg: #f5f7fa;
+		--sm-panel: #ffffff;
+		--sm-border: #d9e0e7;
+		--sm-text: #1e293b;
+		--sm-text-dim: #64748b;
+		--sm-accent: #4f46e5;
+		--sm-accent-hover: #6366f1;
+	}
+}
+
+body { background: var(--sm-bg); color: var(--sm-text); }
+
+/* Panels */
+.sm-sidebar { background: var(--sm-panel); border-color: var(--sm-border); color: var(--sm-text-dim); }
+.sm-sidebar .file-item { transition: background .12s ease, color .12s ease; cursor: default; }
+.sm-sidebar .file-item.active { background: var(--sm-sidebar-active-bg); color: var(--sm-text); }
+.sm-sidebar .file-item:not(.active):hover { background: var(--sm-sidebar-hover-bg); }
+.sm-diagnostics { background: var(--sm-panel-alt); border-color: var(--sm-border); }
+.sm-statusbar { background: var(--sm-status-bg); color: var(--sm-status-fg); border-top: 1px solid var(--sm-border); }
+.sm-statusbar .primary { color: var(--sm-status-fg-strong); }
+.sm-button-primary { background: var(--sm-accent); }
+.sm-button-primary:hover { background: var(--sm-accent-hover); }
+
+/* Monaco integration root override when light theme active */
+:root[data-theme='light'] .monaco-editor, :root[data-theme='light'] .monaco-editor-background { background-color: #ffffff !important; }
+:root[data-theme='light'] .monaco-editor, :root[data-theme='light'] .monaco-editor .margin { background-color: #ffffff !important; }
+
+/* Scrollbar accent (webkit) */
+body::-webkit-scrollbar, .sm-diagnostics::-webkit-scrollbar, .sm-sidebar::-webkit-scrollbar { width: 10px; }
+body::-webkit-scrollbar-track, .sm-diagnostics::-webkit-scrollbar-track, .sm-sidebar::-webkit-scrollbar-track { background: transparent; }
+body::-webkit-scrollbar-thumb, .sm-diagnostics::-webkit-scrollbar-thumb, .sm-sidebar::-webkit-scrollbar-thumb { background: var(--sm-scrollbar); border-radius: 6px; }
+body::-webkit-scrollbar-thumb:hover, .sm-diagnostics::-webkit-scrollbar-thumb:hover, .sm-sidebar::-webkit-scrollbar-thumb:hover { background: var(--sm-accent); }

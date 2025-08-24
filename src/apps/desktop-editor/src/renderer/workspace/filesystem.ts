@@ -15,7 +15,7 @@ export function createInitialWorkspace(): WorkspaceState {
     files: [
       {
         name: 'project.story',
-  content: `::story: demo\nfiles:\n - intro.narrative\n - level1.narrative\n@title: Demo Project\n::end: {{ demo }}`,
+  content: `::story: demo\n  @title: Demo Project\n  @authors: Author Name\n  @copyright_holder: Copyright Holder\n  @address: 123 Example Road, City, Country\n  @email: contact@example.com\n  @phone: 0000 000 0000\n  @start: intro\n  files:\n    - intro.narrative\n    - level1.narrative\n::end: {{ demo }}`,
   dirty: true
       },
       {
@@ -62,10 +62,14 @@ export function removeFile(state: WorkspaceState, name: string): boolean {
   return true;
 }
 
-export function newStoryTemplate(id: string): string {
-  return `::story: ${id}\n@title: ${id.replace(/_/g,' ')}\nfiles:\n::end: {{ ${id} }}`;
+export function newStoryTemplate(id: string, titleOverride?: string): string {
+  const baseName = (titleOverride || id).replace(/_/g,' ');
+  // Starter narrative uses canonical name intro.narrative
+  const firstNarr = `intro.narrative`;
+  return `::story: ${id}\n  @title: ${baseName || 'Title of Story'}\n  @authors: Author Name\n  @copyright_holder: Copyright Holder\n  @address: 123 Example Road, City, Country\n  @email: contact@example.com\n  @phone: 0000 000 0000\n  @start: intro\n  files:\n    - ${firstNarr}\n::end: {{ ${id} }}`;
 }
 
 export function newNarrativeTemplate(id: string): string {
-  return `::narrative: ${id}\n@title: ${id.replace(/_/g,' ')}\n::scene: scene1\n@title: Scene 1\n::end: {{ scene1 }}\n::end: {{ ${id} }}`;
+  const nice = id.replace(/_/g,' ');
+  return `::narrative: ${id}\n  @title: ${nice}\n\n    ::scene: scene1\n      @title: Scene 1\n    ::end: {{ scene1 }}\n::end: {{ ${id} }}`;
 }
