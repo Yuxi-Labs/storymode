@@ -34,7 +34,7 @@ npm install @yuxi-labs/storymode-core
 
 From Git before publish or for a pinned tag/commit (repository path unchanged):
 ```bash
-npm install Yuxi-Labs/storymode-core#v0.2.0
+npm install Yuxi-Labs/storymode-core#v0.2.1
 # or a specific commit
 npm install Yuxi-Labs/storymode-core#<commit-sha>
 ```
@@ -105,12 +105,12 @@ Defined in `DiagnosticCodes`:
 Additional expectation errors are emitted as `EXPECTED_<TOKEN>` dynamically.
 
 ### Versioning & Stability
-`STORYMODE_CORE_VERSION` exported (current: `0.2.0`). While in `0.x`:
+`STORYMODE_CORE_VERSION` exported (current: `0.2.1`). While in `0.x`:
 - Minor bumps (0.x → 0.(x+1).0) may introduce breaking grammar / diagnostic changes.
 - Patch bumps should remain safe.
 - Two stable consecutive minors without grammar / diagnostic mutation will trigger a 1.0 review.
 
-Pin exact versions in downstream tools: `"@yuxi-labs/storymode-core": "0.2.0"`.
+Pin exact versions in downstream tools: `"@yuxi-labs/storymode-core": "0.2.1"`.
 
 > Renamed: originally published briefly as unscoped `storymode-core`; future releases will use the scoped name for ecosystem consistency.
 
