@@ -22,6 +22,36 @@
 
 Core SDK for StoryMode.
 
+> **Status: Experimental (0.x)**  
+> Grammar, AST node shapes, and diagnostic codes can still change between minor versions. Treat any 0.x minor bump as potentially breaking.
+
+## Install
+
+After publish:
+```bash
+npm install storymode-core
+```
+
+From Git before publish or for a pinned tag/commit:
+```bash
+npm install Yuxi-Labs/storymode-core#v0.2.0
+# or a specific commit
+npm install Yuxi-Labs/storymode-core#<commit-sha>
+```
+
+## Quick Usage
+```ts
+import { parseStory, parseNarrative } from 'storymode-core';
+
+const story = `story MyStory`;
+const storyResult = parseStory(story);
+console.log(storyResult.ast, storyResult.diagnostics);
+
+const narrative = `narrative MyNarrative\nscene Intro`;
+const narrativeResult = parseNarrative(narrative);
+console.log(narrativeResult.ast, narrativeResult.diagnostics);
+```
+
 ## Scope (What This Package Does)
 - Independent lexers: `lexStory`, `lexNarrative`
 - Independent parsers: `parseStory`, `parseNarrative`
@@ -74,8 +104,13 @@ Defined in `DiagnosticCodes`:
 
 Additional expectation errors are emitted as `EXPECTED_<TOKEN>` dynamically.
 
-### Versioning
-`STORYMODE_CORE_VERSION` exported. Current: `0.2.0` — separation finalized; compiler & validation removed.
+### Versioning & Stability
+`STORYMODE_CORE_VERSION` exported (current: `0.2.0`). While in `0.x`:
+- Minor bumps (0.x → 0.(x+1).0) may introduce breaking grammar / diagnostic changes.
+- Patch bumps should remain safe.
+- Two stable consecutive minors without grammar / diagnostic mutation will trigger a 1.0 review.
+
+Pin exact versions in downstream tools: `"storymode-core": "0.2.0"`.
 
 ## Future (Out of Core Packages)
 - `storymode-compiler` (AST -> runtime/compiled forms)

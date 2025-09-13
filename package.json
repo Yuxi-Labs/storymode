@@ -4,17 +4,21 @@
   "description": "Core SDK for StoryMode DSL: lexing, parsing, AST, diagnostics.",
   "license": "MIT",
   "type": "module",
-  "main": "dist/storymode.js",
-  "types": "dist/storymode.d.ts",
-  "bin": {
-    "smc": "dist/bin/smc.js"
+  "main": "dist/storymodeIndex.js",
+  "types": "dist/storymodeIndex.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/storymodeIndex.d.ts",
+      "default": "./dist/storymodeIndex.js"
+    }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -w -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "prepublishOnly": "npm run build && npm test"
   },
   "files": ["dist"],
   "engines": {
