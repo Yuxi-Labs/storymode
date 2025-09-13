@@ -1,54 +1,30 @@
 {
-  "name": "storymode",
-  "version": "0.0.1",
-  "description": "This is the StoryMode SDK.",
+  "name": "storymode-core",
+  "version": "0.2.0",
+  "description": "Core SDK for StoryMode DSL: lexing, parsing, AST, diagnostics.",
+  "license": "MIT",
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+  "main": "dist/storymode.js",
+  "types": "dist/storymode.d.ts",
+  "bin": {
+    "smc": "dist/bin/smc.js"
   },
   "scripts": {
-    "build": "turbo build",
-    "lint": "turbo lint",
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
     "test": "vitest run",
-    "dev:web": "vite --config src/apps/desktop-editor/vite.config.ts",
-  "dev:desktop": "concurrently -k -n RENDERER,MAIN,ELECTRON \"vite --config src/apps/desktop-editor/vite.config.ts\" \"vite build --watch --config src/apps/desktop-editor/vite.main.config.ts\" \"wait-on dist/apps/desktop-editor/main/electron-main.js http://localhost:5173 && cross-env STORYMODE_DEV=1 electron dist/apps/desktop-editor/main/electron-main.js --dev\"",
-    "dev": "npm run dev:desktop",
-    "desktop:build:renderer": "vite build --config src/apps/desktop-editor/vite.config.ts",
-    "desktop:build:main": "vite build --config src/apps/desktop-editor/vite.main.config.ts",
-    "desktop:build": "npm run desktop:build:renderer && npm run desktop:build:main"
+    "test:watch": "vitest",
+    "lint": "eslint . --ext .ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Yuxi-Labs/storymode.git"
+  "files": ["dist"],
+  "engines": {
+    "node": ">=18"
   },
-  "bugs": {
-    "url": "https://github.com/Yuxi-Labs/storymode/issues"
-  },
-  "homepage": "https://github.com/Yuxi-Labs/storymode#readme",
-  "license": "ISC",
+  "dependencies": {},
   "devDependencies": {
-    "turbo": "^2.5.6",
-    "typescript": "^5.5.0",
+    "typescript": "^5.5.4",
     "vitest": "^1.6.0",
-    "@types/node": "^20.11.0",
-    "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1",
-    "electron": "^30.0.0",
-    "cross-env": "^7.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "vite": "^5.3.0",
-    "@vitejs/plugin-react": "^4.0.0",
-    "tailwindcss": "^3.4.7",
-    "postcss": "^8.4.41",
-    "autoprefixer": "^10.4.19",
-    "concurrently": "^8.2.2",
-    "wait-on": "^7.2.0",
-    "monaco-editor": "^0.49.0"
+    "eslint": "^8.57.0",
+    "@types/node": "^20.14.9"
   }
 }
