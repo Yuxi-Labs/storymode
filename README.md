@@ -27,12 +27,12 @@ Core SDK for StoryMode.
 
 ## Install
 
-After publish:
+After publish (scoped package):
 ```bash
-npm install storymode-core
+npm install @yuxi-labs/storymode-core
 ```
 
-From Git before publish or for a pinned tag/commit:
+From Git before publish or for a pinned tag/commit (repository path unchanged):
 ```bash
 npm install Yuxi-Labs/storymode-core#v0.2.0
 # or a specific commit
@@ -41,7 +41,7 @@ npm install Yuxi-Labs/storymode-core#<commit-sha>
 
 ## Quick Usage
 ```ts
-import { parseStory, parseNarrative } from 'storymode-core';
+import { parseStory, parseNarrative } from '@yuxi-labs/storymode-core';
 
 const story = `story MyStory`;
 const storyResult = parseStory(story);
@@ -83,7 +83,7 @@ import {
 	Position,
 	Range,
 	STORYMODE_CORE_VERSION
-} from 'storymode-core';
+} from '@yuxi-labs/storymode-core';
 ```
 
 ### Lexers
@@ -110,7 +110,9 @@ Additional expectation errors are emitted as `EXPECTED_<TOKEN>` dynamically.
 - Patch bumps should remain safe.
 - Two stable consecutive minors without grammar / diagnostic mutation will trigger a 1.0 review.
 
-Pin exact versions in downstream tools: `"storymode-core": "0.2.0"`.
+Pin exact versions in downstream tools: `"@yuxi-labs/storymode-core": "0.2.0"`.
+
+> Renamed: originally published briefly as unscoped `storymode-core`; future releases will use the scoped name for ecosystem consistency.
 
 ## Future (Out of Core Packages)
 - `storymode-compiler` (AST -> runtime/compiled forms)
