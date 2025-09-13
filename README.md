@@ -1,5 +1,25 @@
 # StoryMode Core
 
+<p>
+  <!-- Latest Release -->
+  <img src="https://img.shields.io/github/v/release/Yuxi-Labs/storymode-core?include_prereleases&sort=semver" alt="Latest Release" />
+
+  <!-- Open Issues -->
+  <img src="https://img.shields.io/github/issues/Yuxi-Labs/storymode-core" alt="Open Issues" />
+
+  <!-- Pull Requests -->
+  <img src="https://img.shields.io/github/issues-pr/Yuxi-Labs/storymode-core" alt="Pull Requests" />
+
+  <!-- Last Commit -->
+  <img src="https://img.shields.io/github/last-commit/Yuxi-Labs/storymode-core" alt="Last Commit" />
+
+  <!-- Contributors -->
+  <img src="https://img.shields.io/github/contributors/Yuxi-Labs/storymode-core" alt="Contributors" />
+
+  <!-- License -->
+  <img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT" />
+</p>
+
 Core SDK for StoryMode.
 
 ## Scope (What This Package Does)
