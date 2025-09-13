@@ -1,5 +1,5 @@
 {
-  "name": "@yuxi-labs/storymode-core",
+  "name": "@yuxilabs/storymode-core",
   "version": "0.2.1",
   "description": "Core SDK for StoryMode DSL: lexing, parsing, AST, diagnostics.",
   "license": "MIT",
