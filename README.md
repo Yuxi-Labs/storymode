@@ -32,8 +32,8 @@ Core SDK for StoryMode.
 After publish (scoped package):
 After publish (scoped package):
 ```bash
-npm install @yuxi-labs/storymode-core
-npm install @yuxi-labs/storymode-core
+npm install @yuxilabs/storymode-core
+npm install @yuxilabs/storymode-core
 ```
 
 From Git before publish or for a pinned tag/commit (repository path unchanged):
