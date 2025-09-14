@@ -20,15 +20,16 @@
     "lint": "eslint . --ext .ts",
     "prepublishOnly": "npm run build && npm test"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {},
   "devDependencies": {
-    "typescript": "^5.5.4",
-    "vitest": "^1.6.0",
+    "@types/node": "^20.14.9",
     "eslint": "^8.57.0",
-    "@types/node": "^20.14.9"
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.0"
   }
 }
