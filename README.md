@@ -105,10 +105,10 @@ npm publish --access public --provenance
 ### Notes on Diagnostics
 Unexpected token order inside the parsers may also produce dynamic `EXPECTED_<TOKEN>` style messages (non-enumerated). Ordering / media errors rely on the fixed codes listed above.
 `STORYMODE_CORE_VERSION` exported (current version matches package). While in `0.x`:
-Pin exact versions in downstream tools: `"@yuxi-labs/storymode-core": "0.2.x"` (avoid caret if you need grammar stability).
+Pin exact versions in downstream tools: "@yuxilabs/storymode-core": "0.2.x" (avoid caret if you need grammar stability).
 ## Future (Planned Packages)
 ## Principles
-import { parseStory, parseNarrative } from '@yuxi-labs/storymode-core';
+import { parseStory, parseNarrative } from '@yuxilabs/storymode-core';
 
 const story = `story MyStory`;
 const storyResult = parseStory(story);
@@ -150,7 +150,7 @@ import {
 	Position,
 	Range,
 	STORYMODE_CORE_VERSION
-} from '@yuxi-labs/storymode-core';
+} from '@yuxilabs/storymode-core';
 ```
 
 ### Lexers
@@ -177,7 +177,7 @@ Additional expectation errors are emitted as `EXPECTED_<TOKEN>` dynamically.
 - Patch bumps should remain safe.
 - Two stable consecutive minors without grammar / diagnostic mutation will trigger a 1.0 review.
 
-Pin exact versions in downstream tools: `"@yuxi-labs/storymode-core": "0.2.1"`.
+Pin exact versions in downstream tools: "@yuxilabs/storymode-core": "0.2.1".
 
 > Renamed: originally published briefly as unscoped `storymode-core`; future releases will use the scoped name for ecosystem consistency.
 
