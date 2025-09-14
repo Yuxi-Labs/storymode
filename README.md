@@ -1,4 +1,6 @@
 # StoryMode Core
+Core SDK for the StoryMode DSL (lexing, parsing, AST + diagnostics) with strict scene ordering rules.
+# StoryMode Core
 
 <p>
   <!-- Latest Release -->
@@ -28,7 +30,9 @@ Core SDK for StoryMode.
 ## Install
 
 After publish (scoped package):
+After publish (scoped package):
 ```bash
+npm install @yuxi-labs/storymode-core
 npm install @yuxi-labs/storymode-core
 ```
 
@@ -40,7 +44,70 @@ npm install Yuxi-Labs/storymode-core#<commit-sha>
 ```
 
 ## Quick Usage
+## Quick Usage
 ```ts
+const story = `::story: my_story\n@title: My Story\nfiles:\n- intro.narrative`;
+const narrative = `::narrative: intro\n\n::scene: opening\n@title: Opening Scene`;
+## DSL Snapshot (Symbols & Keywords)
+| Type | Examples |
+|------|----------|
+| Declarations | `::story: id`, `::narrative: id`, `::scene: id` |
+| Metadata | `@title: Text`, `@location: Place` |
+| Unicode (media / flow) | `⦿` (sfx), `⬟` (vfx), `♬` (music), `⧈` (camera), `⇝` (goto), `✎` (note) |
+| Character / Dialogue | `🞶 Name`, `↠` dialogue, `↪` continuation, `∵` thought |
+| Structural | `¶` paragraph start |
+
+> Parser currently enforces ordering + metadata constraints and produces diagnostics for violations; semantic node population for characters/media is staged for later versions.
+
+## Scene Ordering (Strict Phases)
+Inside each `::scene:` the parser applies a one‑way progression:
+1. Metadata (`@key:` lines)
+2. Global Media Cues (`⦿ ⬟ ♬ ⧈` before any characters)
+3. Character Blocks (`🞶` + pre‑dialogue media then `↠`/`∵` lines)
+4. Paragraph Blocks (`¶` ... narrative prose)
+5. Redirections (`⇝ target_scene`)
+6. Notes (`✎ ...`)
+
+Violations (e.g., media after dialogue, metadata late, global media after characters) emit diagnostics; parse still returns partial AST.
+
+## Diagnostics (Core + Ordering)
+| Code | Meaning |
+|------|---------|
+| `MISSING_STORY_DECL` | Story file missing leading declaration |
+| `MISSING_STORY_ID` | Story id absent |
+| `MISSING_NARRATIVE_DECL` | Narrative file missing declaration |
+| `MISSING_NARRATIVE_ID` | Narrative id absent |
+| `MISSING_SCENE_ID` | Scene id absent |
+| `DUP_KEY` | Duplicate metadata key in same scope |
+| `NARRATIVE_METADATA_FORBIDDEN` | Metadata found before first scene |
+| `OUT_OF_ORDER_PHASE` | Construct appears after a later phase began |
+| `MEDIA_CUE_AFTER_DIALOGUE` | Character media placed after dialogue started |
+| `UNKNOWN_SYMBOL` | Symbol recognized lexically but not mapped semantically |
+
+## Publishing (Maintainers)
+The package is scoped; first publish must specify public access:
+```bash
+# Bump version first (example patch bump)
+npm version patch
+# Publish (runs build + tests via prepublishOnly)
+npm publish --access public
+```
+Dry run:
+```bash
+npm publish --dry-run
+```
+Optional provenance (if your npm account supports it):
+```bash
+npm publish --access public --provenance
+```
+## Scope (What This Package Does)
+## API Surface
+### Notes on Diagnostics
+Unexpected token order inside the parsers may also produce dynamic `EXPECTED_<TOKEN>` style messages (non-enumerated). Ordering / media errors rely on the fixed codes listed above.
+`STORYMODE_CORE_VERSION` exported (current version matches package). While in `0.x`:
+Pin exact versions in downstream tools: `"@yuxi-labs/storymode-core": "0.2.x"` (avoid caret if you need grammar stability).
+## Future (Planned Packages)
+## Principles
 import { parseStory, parseNarrative } from '@yuxi-labs/storymode-core';
 
 const story = `story MyStory`;
