@@ -1,6 +1,6 @@
 {
   "name": "@yuxilabs/storymode-core",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Core SDK for StoryMode DSL: lexing, parsing, AST, diagnostics.",
   "license": "MIT",
   "type": "module",

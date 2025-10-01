@@ -1,6 +1,6 @@
 // StoryMode DSL AST core (diagnostics & positions imported for SoC)
-import { Position, Range, Diagnostic, DiagnosticSeverity, DiagnosticCodes, DiagnosticCode } from './diagnostics';
-export { Position, Range, Diagnostic, DiagnosticSeverity, DiagnosticCodes, DiagnosticCode } from './diagnostics';
+import { Position, Range, Diagnostic, DiagnosticSeverity, DiagnosticCodes, DiagnosticCode } from './diagnostics.js';
+export { Position, Range, Diagnostic, DiagnosticSeverity, DiagnosticCodes, DiagnosticCode } from './diagnostics.js';
 export interface BaseNode { kind: string; range: Range; }
 export interface StoryFile extends BaseNode { kind: 'StoryFile'; id: string; title?: string; metadata: Record<string,string|string[]>; files: string[]; start?: string; }
 export interface NarrativeFile extends BaseNode { kind: 'NarrativeFile'; id: string; scenes: Scene[]; }

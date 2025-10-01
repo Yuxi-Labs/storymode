@@ -16,5 +16,9 @@ export const DiagnosticCodes = {
 	OUT_OF_ORDER_PHASE: 'OUT_OF_ORDER_PHASE',
 	MEDIA_CUE_AFTER_DIALOGUE: 'MEDIA_CUE_AFTER_DIALOGUE',
 	UNKNOWN_SYMBOL: 'UNKNOWN_SYMBOL'
+	, DUP_SCENE_ID: 'DUP_SCENE_ID'
+	, UNRESOLVED_FILE: 'UNRESOLVED_FILE'
+	, MISSING_START_TARGET: 'MISSING_START_TARGET'
+	, DUP_FILE_ENTRY: 'DUP_FILE_ENTRY'
 } as const;
 export type DiagnosticCode = typeof DiagnosticCodes[keyof typeof DiagnosticCodes];

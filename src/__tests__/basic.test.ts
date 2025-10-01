@@ -1,4 +1,4 @@
-import { parseStory, parseNarrative } from '../storymodeIndex';
+import { parseStory, parseNarrative } from '../storymodeIndex.js';
 import { describe, it, expect } from 'vitest';
 
 const storySample = `::story: echoes_of_starlight\n@title: Echoes of Starlight\n@start: intro\nfiles:\n- intro.narrative\n`;

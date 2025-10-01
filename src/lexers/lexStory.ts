@@ -1,4 +1,5 @@
-import { Position, Range, Token, TokenType } from '../types/ast';
+import { Position, Range, Token, TokenType } from '../types/ast.js';
+import { isIdentStart, isIdentContinue, isKeyStart, isKeyContinue } from './unicode.js';
 
 function makePos(offset: number, line: number, column: number): Position { return { offset, line, column }; }
 function makeRange(start: Position, end: Position): Range { return { start, end }; }
@@ -35,18 +36,17 @@ export function lexStory(input: string, options: StoryLexerOptions = {}): Token[
 		if (ch === ':' && input.startsWith('::', startOffset)) {
 			offset += 2; column += 2;
 			let word = '';
-			while (offset < input.length && /[a-zA-Z_]/.test(input[offset])) { word += input[offset]; offset++; column++; }
+			while (offset < input.length && isIdentStart(input[offset])) { word += input[offset]; offset++; column++; }
 			if (input[offset] === ':') {
 				offset++; column++;
 				if (word === 'story') push('StoryDecl', 'story', startOffset, startLine, startColumn);
 				else {
-					// Treat any other ::word: in a story file as Unknown (not narrative/scene)
 					push('Unknown', word, startOffset, startLine, startColumn);
 				}
-				// Optional identifier immediately following
+				// Optional identifier immediately following (Unicode)
 				let id = '';
 				const idStartOffset = offset;
-				while (offset < input.length && /[a-zA-Z0-9_]/.test(input[offset])) { id += input[offset]; offset++; column++; }
+				while (offset < input.length && isIdentContinue(input[offset])) { id += input[offset]; offset++; column++; }
 				if (id) {
 					const idStart = makePos(idStartOffset, startLine, startColumn + (idStartOffset - startOffset));
 					const idEnd = makePos(offset, line, column);
@@ -62,7 +62,7 @@ export function lexStory(input: string, options: StoryLexerOptions = {}): Token[
 		if (ch === '@') {
 			offset++; column++;
 			let key = '';
-			while (offset < input.length && /[a-zA-Z0-9_]/.test(input[offset])) { key += input[offset]; offset++; column++; }
+			while (offset < input.length && isKeyContinue(input[offset])) { key += input[offset]; offset++; column++; }
 			if (input[offset] === ':') { offset++; column++; push('AtKey', key, startOffset, startLine, startColumn); }
 			else push('Unknown', '@' + key, startOffset, startLine, startColumn);
 			continue;
@@ -70,9 +70,9 @@ export function lexStory(input: string, options: StoryLexerOptions = {}): Token[
 		if (ch === '-') { offset++; column++; push('Dash', '-', startOffset, startLine, startColumn); continue; }
 		if (ch === ':') { offset++; column++; push('Colon', ':', startOffset, startLine, startColumn); continue; }
 		// bare identifiers (including files section)
-		if (/[a-zA-Z_]/.test(ch)) {
+		if (isIdentStart(ch)) {
 			let ident = '';
-			while (offset < input.length && /[a-zA-Z0-9_\.]/.test(input[offset])) { ident += input[offset]; offset++; column++; }
+			while (offset < input.length && isIdentContinue(input[offset])) { ident += input[offset]; offset++; column++; }
 			if (ident.toLowerCase() === 'files') push('FilesSection', ident, startOffset, startLine, startColumn);
 			else push('Identifier', ident, startOffset, startLine, startColumn);
 			continue;

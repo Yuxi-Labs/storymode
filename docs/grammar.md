@@ -9,15 +9,15 @@ This reflects only what the core lexer + parsers currently recognize. Anything e
 ## Common Lexical Elements
 | Element | Form | Notes |
 |---------|------|-------|
-| Story Declaration | `::story:<id>` | `<id>` = `[A-Za-z0-9_]+` optional (diagnostic if missing) |
-| Narrative Declaration | `::narrative:<id>` | Narrative files only |
-| Scene Declaration | `::scene:<id>` | Narrative files only; `<id>` required |
-| Metadata Key | `@key:` | Key = `[A-Za-z0-9_]+` followed by `:` then rest of line is value |
+| Story Declaration | `::story:<id>` | `<id>` now Unicode: `[\p{L}_][\p{L}\p{N}_]*` (Chinese supported); diagnostic if missing |
+| Narrative Declaration | `::narrative:<id>` | Narrative files only (same Unicode id rule) |
+| Scene Declaration | `::scene:<id>` | Narrative files only; Unicode id required |
+| Metadata Key | `@key:` | Key = `[\p{L}_][\p{L}\p{N}_]*` (no dots) followed by `:`; rest of line is value |
 | Files Section (story) | `files:` | Introduces a list of narrative filenames |
 | List Item (story files) | `- filename.ext` | Collected under files section |
 | Newline | `\n` or `\r?\n` | Always tokenized as `Newline` |
 | Whitespace | spaces / tabs | Collapsed; only emitted if lexer option `preserveWhitespace` used |
-| Identifier | `[A-Za-z_][A-Za-z0-9_\.]*` | After declarations or standalone |
+| Identifier | `[\p{L}_][\p{L}\p{N}_\.]*` | Unicode letters & numbers (Chinese) supported |
 | EOF | end of input | Synthetic token appended |
 
 ## Story File Structure (Parsed Output)
@@ -58,6 +58,9 @@ Scenes may appear sequentially. Metadata lines between scene declarations belong
 |-------|--------|------|
 | `id` | scene declaration id | string |
 | `metadata` | `@key:` lines under the scene until next scene/EOF | `Record<string,string|string[]>` |
+
+## Unicode Notes
+Identifiers and metadata keys accept any Unicode letter (\p{L}) and digits (\p{N}) after the first character, plus `_` and (for general identifiers) `.`. Normalization is not applied; host tools may normalize (recommended NFC) before parsing for consistency.
 
 ## Ignored / Not Yet Implemented
 - Dialogue / character blocks

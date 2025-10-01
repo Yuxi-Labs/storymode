@@ -1,6 +1,6 @@
 # Diagnostics Reference
 
-All diagnostics produced by the core parsers are syntactic / structural. Semantic or cross-file checks are intentionally excluded.
+All diagnostics produced by the core parsers were originally syntactic / structural only. As of 0.3.x a small set of opt-in semantic validations (scene/file uniqueness & resolution) are introduced.
 
 ## Codes
 | Code | Severity | Emitted When | Notes |
@@ -12,6 +12,14 @@ All diagnostics produced by the core parsers are syntactic / structural. Semanti
 | `MISSING_SCENE_ID` | error | `::scene:` without following identifier | Scene created with empty id |
 | `DUP_KEY` | warning | Metadata key repeats within same story file | Last value wins |
 | `EXPECTED_<TOKEN>` | error | Parser expectation helper sees wrong token type | `<TOKEN>` is dynamic (e.g., `EXPECTED_Identifier`) |
+| `NARRATIVE_METADATA_FORBIDDEN` | error | Metadata appears before first scene in narrative | Narrative top-level forbids @metadata |
+| `OUT_OF_ORDER_PHASE` | error | Construct appears after later content phase began | Phase ordering: metadata→media→character/dialogue→paragraph→goto→note |
+| `MEDIA_CUE_AFTER_DIALOGUE` | error | Character-scoped media emitted after dialogue in same block | Must precede dialogue lines |
+| `UNKNOWN_SYMBOL` | warning | Unicode symbol token not recognized in ordering rules | Future symbol or typo |
+| `DUP_SCENE_ID` | error | Two scenes share the same id within one narrative | Second and onward flagged |
+| `UNRESOLVED_FILE` | error | Entry in story `files` does not resolve via provided resolver | Resolver supplied by host |
+| `MISSING_START_TARGET` | error | Story `@start:` references id not present in `files` list | Emitted only if `@start` present |
+| `DUP_FILE_ENTRY` | warning | Duplicate path in story `files` list | Later entries ignored by tooling |
 
 ## Structure
 Each diagnostic:

@@ -1,5 +1,5 @@
-import { Diagnostic, ParseResult, StoryFile, Token, DiagnosticCodes } from '../types/ast';
-import { lexStory } from '../lexers/lexStory';
+import { Diagnostic, ParseResult, StoryFile, Token, DiagnosticCodes } from '../types/ast.js';
+import { lexStory } from '../lexers/lexStory.js';
 
 export function parseStory(source: string): ParseResult<StoryFile> {
   const tokens = lexStory(source);
