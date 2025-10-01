@@ -11,7 +11,7 @@ Core SDK for the StoryMode DSL: lexing, parsing, AST types, diagnostics, orderin
   <img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT" />
 </p>
 
-> Status: Stable pre-1.0 (`0.x`). Grammar & diagnostic surfaces are tracked; breaking changes are still possible on minor bumps, but core constructs are expected to remain steady.
+> Status: Stable pre-1.0 (`0.x`). Grammar & diagnostic surfaces are tracked; breaking changes are still possible on major bumps, but core constructs are expected to remain steady.
 
 ## Install
 ```bash
@@ -95,9 +95,6 @@ import {
 } from '@yuxilabs/storymode-core';
 ```
 Types (`StoryFile`, `NarrativeFile`, `Scene`, `Token`, etc.) are exported for tooling.
-
-## Versioning
-`STORYMODE_CORE_VERSION` reflects the runtime version (current: `0.3.0`). While `<1.0.0` minor bumps may still introduce controlled breaking changes; patch bumps aim to be safe.
 
 ## Non-Goals (Core Package)
 - Multi-file project graph orchestration
